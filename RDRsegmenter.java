@@ -302,6 +302,15 @@ public class RDRsegmenter
         }
     }
 
+    public void segmentFromBufferedReaderAndPrintToStdout(BufferedReader reader) throws IOException {
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String segmentedLine = segmentRawString(line);
+            System.out.println(segmentedLine);
+        }
+        reader.close();
+    }
+
     public static void main(String[] args)
         throws IOException
     {
@@ -309,7 +318,24 @@ public class RDRsegmenter
 
         // segmenter.segmentRawCorpus(args[0]);
 
-        segmenter.segmentDirectory(args[0], args[1]);
+        // segmenter.segmentDirectory(args[0], args[1]);
+
+        String command = args[0];
+
+        if (command.equals("DIRECT")) {
+            String line = args[1];
+            String segmentedLine = segmenter.segmentRawString(line);
+            System.out.println(segmentedLine);
+        } else if (command.equals("FILE")) {
+            String filePath = args[1];
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(filePath)), "UTF-8"));
+            segmenter.segmentFromBufferedReaderAndPrintToStdout(reader);
+        } else if (command.equals("STDIN")) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            segmenter.segmentFromBufferedReaderAndPrintToStdout(reader);
+        } else {
+            System.err.println("ERROR: Command not supported: " + command);
+        }
 
         // Get output of input test set for evaluation
         // segmenter.segmentTokenizedCorpus("data/Test.txt");
