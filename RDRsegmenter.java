@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
@@ -29,8 +30,12 @@ public class RDRsegmenter
     private void constructTreeFromRulesFile(String rulesFilePath)
         throws IOException
     {
-        BufferedReader buffer = new BufferedReader(
-                new InputStreamReader(new FileInputStream(new File(rulesFilePath)), "UTF-8"));
+        InputStream in = RDRsegmenter.class.getResourceAsStream("/Model.RDR");
+        if (in == null) {
+            throw new FileNotFoundException("Model.RDR not found!");
+        }
+
+        BufferedReader buffer = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String line = buffer.readLine();
 
         this.root = new Node(new FWObject(false), "NN", null, null, null, 0);

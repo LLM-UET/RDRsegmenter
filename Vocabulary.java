@@ -1,5 +1,7 @@
-import java.io.FileInputStream;
+// import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.HashSet;
 import java.util.Set;
@@ -9,16 +11,27 @@ public class Vocabulary
 {
     public static Set<String> VN_DICT;
     static {
-        VN_DICT = new HashSet<String>();
-        try {
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("VnVocab"));
-            VN_DICT = (Set<String>) ois.readObject();
-            ois.close();
-        }
-        catch (IOException | ClassNotFoundException e1) {
-            // TODO Auto-generated catch block
+        // VN_DICT = new HashSet<String>();
+        // try {
+        //     ObjectInputStream ois = new ObjectInputStream(new FileInputStream("VnVocab"));
+        //     VN_DICT = (Set<String>) ois.readObject();
+        //     ois.close();
+        // }
+        // catch (IOException | ClassNotFoundException e1) {
+        //     // TODO Auto-generated catch block
+        //     e1.printStackTrace();
+        // }
+        try (InputStream in = RDRsegmenter.class.getResourceAsStream("/VnVocab")) {
+            if (in == null) {
+                throw new FileNotFoundException("VnVocab not found in JAR!");
+            }
+            try (ObjectInputStream ois = new ObjectInputStream(in)) {
+                VN_DICT = (Set<String>) ois.readObject();
+            }
+        } catch (IOException | ClassNotFoundException e1) {
             e1.printStackTrace();
         }
+
         // BufferedReader buffer;
         // try {
         // buffer = new BufferedReader(new InputStreamReader(

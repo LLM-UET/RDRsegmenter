@@ -67,8 +67,10 @@ printed to `stdout`.
 
 ### Packaging into fat JAR
 
+Remember to [compile](#compilation) first. Then:
+
 ```sh
-jar cfm RDRsegmenter.jar MANIFEST.MF *.class
+jar cfm RDRsegmenter.jar MANIFEST.MF *.class Model.RDR VnVocab
 ```
 
 Explanation:
