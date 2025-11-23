@@ -13,9 +13,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import httpd.Response;
+import httpd.WebServer;
+
 /**
  * @author DatQuocNguyen
- * 
+ * @author Vu Tung Lam
  */
 public class RDRsegmenter
 {
@@ -316,6 +319,30 @@ public class RDRsegmenter
         reader.close();
     }
 
+    public void serveTxtRpc(int port) {
+        WebServer server = new WebServer(this::handleTxtRpcRequest);
+        try {
+            server.run(port);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Response handleTxtRpcRequest(String method, String resourcePath, String body) throws Exception {
+        if (method.equals("POST")) {
+            if (resourcePath.equals("/v1/segment")) {
+                StringBuilder outputSb = new StringBuilder();
+                for (String line : body.split("\n")) {
+                    String segmentedLine = segmentRawString(line);
+                    outputSb.append(segmentedLine + "\n");
+                }
+                return new Response(200, "text/plain", outputSb.toString());
+            }
+        }
+
+        return new Response(404, "text/plain", "Not Found");
+    }
+
     public static void main(String[] args)
         throws IOException
     {
@@ -338,6 +365,12 @@ public class RDRsegmenter
         } else if (command.equals("STDIN")) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
             segmenter.segmentFromBufferedReaderAndPrintToStdout(reader);
+        } else if (command.equals("TXT-RPC")) {
+            String portStr = args.length >= 2 ? args[1] : "8024";
+            int port = Integer.parseInt(portStr);
+            System.err.println("Setting up TXT-RPC server...");
+            segmenter.serveTxtRpc(port);
+            System.err.println("TXT-RPC server is running on port " + port);
         } else {
             System.err.println("ERROR: Command not supported: " + command);
         }
